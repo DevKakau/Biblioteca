@@ -1,43 +1,27 @@
 package com.biblioteca.biblioteca.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "TB_BOOK")
 public class Book {
-    @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private Long id;
-    @Getter
-    @Setter
+    private  Long id;
+    private  String nome;
+    private  int anoPublicacao;
 
-    private String nome;
-    @Getter
-    @Setter
-
-    private int anoPublicacao;
-
-    @Getter
-    @Setter
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
-
-
-    public Book(){
-
-    }
-
-    public Book(Long id, String nome, int anoPublicacao) {
-        this.id = id;
-        this.nome = nome;
-        this.anoPublicacao = anoPublicacao;
-    }
 
 
 }

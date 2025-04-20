@@ -1,6 +1,8 @@
 package com.biblioteca.biblioteca.service;
 
 
+import com.biblioteca.biblioteca.dtos.request.UserRequestDTO;
+import com.biblioteca.biblioteca.dtos.response.UserResponseDTO;
 import com.biblioteca.biblioteca.entities.User;
 import com.biblioteca.biblioteca.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -17,9 +20,13 @@ public class UserService {
     private UserRepository userRepository;
 
     // listar todos os usuarios
-    public List<User> getAll(){
-        return userRepository.findAll();
+    public List<UserResponseDTO> getAll(){
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(UserResponseDTO::new) // usando construtor que recebe a entidade
+                .collect(Collectors.toList());
     }
+
 
     // Busca por id
     public Optional<User> GetById(Long id){
@@ -27,8 +34,10 @@ public class UserService {
     }
 
     // Criar um usuario no banco de dados
-    public User createUser(User user){
+    public User createUser(UserRequestDTO userDto){
+        User user = userDto.toEntity();
         return userRepository.save(user);
+
     }
 
     // deletar um usuario do banco de dados atraves do ID
@@ -36,3 +45,5 @@ public class UserService {
         userRepository.deleteById(id);
     }
 }
+
+
