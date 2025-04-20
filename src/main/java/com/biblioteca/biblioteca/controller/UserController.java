@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +45,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> userId(@PathVariable Long id){
         return service.GetById(id)
-                .map(user -> ResponseEntity.ok(new UserResponseDTO(user)))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -54,11 +56,9 @@ public class UserController {
     })
     @PostMapping
     public ResponseEntity<UserResponseDTO> saveUser(@RequestBody UserRequestDTO userDTO){
-        User user = service.createUser(userDTO);
-        return ResponseEntity.ok(new UserResponseDTO(user));
-
+        UserResponseDTO userResponseDTO = service.createUser(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
     }
-
 
     @Operation(description = "Deleta um usuario especifico do sistema")
     @ApiResponses(value = {

@@ -1,5 +1,8 @@
 package com.biblioteca.biblioteca.service;
 
+import com.biblioteca.biblioteca.dtos.request.AuthorRequestDTO;
+import com.biblioteca.biblioteca.dtos.response.AuthorResponseDTO;
+import com.biblioteca.biblioteca.dtos.response.UserResponseDTO;
 import com.biblioteca.biblioteca.entities.Author;
 import com.biblioteca.biblioteca.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorService {
@@ -15,18 +19,26 @@ public class AuthorService {
 
 
     //Listar todos os autores da tabela
-    public List<Author> getAllAuthors(){
-        return authorRepository.findAll();
+    public List<AuthorResponseDTO> getAllAuthors(){
+        List<Author> authors = authorRepository.findAll();
+        return authors.stream()
+                .map(AuthorResponseDTO::new)
+                .collect(Collectors.toList());
+
     }
 
     //Buscar author pelo id
-    public Optional<Author> getById(Long id){
-        return authorRepository.findById(id);
+    public Optional<AuthorResponseDTO> getById(Long id){
+        return authorRepository.findById(id)
+                .map(AuthorResponseDTO::new);
+
     }
 
     //Salvar um autor no db
-    public Author createAuthor(Author author){
-        return authorRepository.save(author);
+    public AuthorResponseDTO createAuthor(AuthorRequestDTO authorRequestDTO){
+        Author author = authorRequestDTO.toEntity();
+        Author saved = authorRepository.save(author);
+        return new AuthorResponseDTO(saved);
     }
 
     //Deletar um autor da tabela pelo id

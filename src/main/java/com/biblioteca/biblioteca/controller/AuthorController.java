@@ -1,11 +1,15 @@
 package com.biblioteca.biblioteca.controller;
 
+import com.biblioteca.biblioteca.dtos.request.AuthorRequestDTO;
+import com.biblioteca.biblioteca.dtos.response.AuthorResponseDTO;
 import com.biblioteca.biblioteca.entities.Author;
 import com.biblioteca.biblioteca.service.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +29,10 @@ public class AuthorController {
     })
 
     @GetMapping
-    public List<Author> authorList(){
-        return service.getAllAuthors();
+    public ResponseEntity<List<AuthorResponseDTO>> authorList(){
+        List<AuthorResponseDTO> authorDTOS = service.getAllAuthors();
+        return ResponseEntity.ok(authorDTOS);
+
     }
     @Operation(description = "Busca um autor pelo id dele")
     @ApiResponses(value = {
@@ -36,10 +42,11 @@ public class AuthorController {
     })
 
     @GetMapping("/{id}")
-    public Optional<Author> authorId(@PathVariable Long id){
-        return service.getById(id);
+    public ResponseEntity<AuthorResponseDTO> authorId(@PathVariable Long id){
+        return service.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-
 
     @Operation(description = "Cria um author com todas as inforções e armazena ao banco de dados")
     @ApiResponses(value = {
@@ -47,8 +54,9 @@ public class AuthorController {
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
     })
     @PostMapping
-    public Author saveAuthor(@RequestBody Author author){
-        return service.createAuthor(author);
+    public ResponseEntity<AuthorResponseDTO> saveAuthor(@RequestBody AuthorRequestDTO authorRequestDTO){
+        AuthorResponseDTO authorResponseDTO = service.createAuthor(authorRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(authorResponseDTO);
     }
 
 

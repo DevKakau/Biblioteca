@@ -3,8 +3,10 @@ package com.biblioteca.biblioteca.dtos.request;
 import com.biblioteca.biblioteca.entities.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class UserRequestDTO {
 

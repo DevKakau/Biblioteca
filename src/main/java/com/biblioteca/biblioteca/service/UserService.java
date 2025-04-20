@@ -29,14 +29,16 @@ public class UserService {
 
 
     // Busca por id
-    public Optional<User> GetById(Long id){
-        return userRepository.findById(id);
+    public Optional<UserResponseDTO> GetById(Long id){
+        return userRepository.findById(id)
+                .map(UserResponseDTO::new);
     }
 
     // Criar um usuario no banco de dados
-    public User createUser(UserRequestDTO userDto){
+    public UserResponseDTO createUser(UserRequestDTO userDto){
         User user = userDto.toEntity();
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        return new UserResponseDTO(saved);
 
     }
 
