@@ -41,7 +41,7 @@ public class UserController {
         UserResponseDTO userResponseDTO = service.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
     }
-    
+
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id){
         service.deleteUser(id);
