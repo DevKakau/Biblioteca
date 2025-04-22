@@ -4,6 +4,7 @@ package com.biblioteca.biblioteca.service;
 import com.biblioteca.biblioteca.dtos.request.UserRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.UserResponseDTO;
 import com.biblioteca.biblioteca.entities.User;
+import com.biblioteca.biblioteca.exception.ConflictException;
 import com.biblioteca.biblioteca.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,10 +37,14 @@ public class UserService {
 
     // Criar um usuario no banco de dados
     public UserResponseDTO createUser(UserRequestDTO userDto){
-        User user = userDto.toEntity();
-        User saved = userRepository.save(user);
-        return new UserResponseDTO(saved);
-
+        if(!userRepository.existsByEmail(userDto.getEmail())){
+            User user = userDto.toEntity();
+            User saved = userRepository.save(user);
+            return new UserResponseDTO(saved);
+        }
+        else {
+            throw new ConflictException("Email invalido!!");
+        }
     }
 
     // deletar um usuario do banco de dados atraves do ID

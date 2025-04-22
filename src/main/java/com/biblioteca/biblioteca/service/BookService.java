@@ -4,6 +4,8 @@ import com.biblioteca.biblioteca.dtos.request.BookRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.BookResponseDTO;
 import com.biblioteca.biblioteca.entities.Author;
 import com.biblioteca.biblioteca.entities.Book;
+import com.biblioteca.biblioteca.exception.ConflictException;
+import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.repository.AuthorRepository;
 import com.biblioteca.biblioteca.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +41,17 @@ public class BookService {
     // salvar um novo livro no banco de dados
     public Book createBook(BookRequestDTO bookDTO){
         Author author = authorRepository.findById(bookDTO.getAuthorId())
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException(String.format("O autor com o id %d não foi encontrado", bookDTO.getAuthorId())));
 
-        Book book = new Book();
-        book.setNome(bookDTO.getNameBook());
-        book.setAuthor(author);
-        book.setAnoPublicacao(bookDTO.getYearPublication());
-        return bookRepository.save(book);
+        if(!bookRepository.existsByNome(bookDTO.getNameBook())){
+            Book book = new Book();
+            book.setNome(bookDTO.getNameBook());
+            book.setAuthor(author);
+            book.setAnoPublicacao(bookDTO.getYearPublication());
+            return bookRepository.save(book);
+        } else {
+          throw  new ConflictException(String.format("O livro com o nome %s já foi cadastrado!!", bookDTO.getNameBook()));
+        }
     }
 
     // deletar livro pelo id

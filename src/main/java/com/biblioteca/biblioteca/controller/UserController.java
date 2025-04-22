@@ -3,6 +3,7 @@ package com.biblioteca.biblioteca.controller;
 import com.biblioteca.biblioteca.dtos.request.UserRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.UserResponseDTO;
 import com.biblioteca.biblioteca.entities.User;
+import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,13 +15,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
     private UserService service;
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
 
     @GetMapping
@@ -33,7 +37,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> userId(@PathVariable Long id){
         return service.GetById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new NotFoundException(String.format("Usuario com o id %d não encontrado", id)));
     }
 
     @PostMapping
@@ -44,6 +48,13 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id){
-        service.deleteUser(id);
+        Optional<UserResponseDTO> user = service.GetById(id);
+        if(user.isPresent()){
+            service.deleteUser(id);
+        }
+        else {
+            throw new NotFoundException(String.format("Usuario com o id %d não encontrado", id));
+        }
+
     }
 }

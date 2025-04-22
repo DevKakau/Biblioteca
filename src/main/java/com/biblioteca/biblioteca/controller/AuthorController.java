@@ -2,11 +2,8 @@ package com.biblioteca.biblioteca.controller;
 
 import com.biblioteca.biblioteca.dtos.request.AuthorRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.AuthorResponseDTO;
-import com.biblioteca.biblioteca.entities.Author;
+import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.AuthorService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +15,24 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/author")
 public class AuthorController {
-    @Autowired
+
+    public AuthorController(AuthorService service) {
+        this.service = service;
+    }
+
     private AuthorService service;
 
     @GetMapping
     public ResponseEntity<List<AuthorResponseDTO>> authorList(){
         List<AuthorResponseDTO> authorDTOS = service.getAllAuthors();
         return ResponseEntity.ok(authorDTOS);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponseDTO> authorId(@PathVariable Long id){
         return service.getById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new NotFoundException(String.format("Autor com o id %d não encontrado", id)));
     }
 
     @PostMapping
@@ -43,8 +43,13 @@ public class AuthorController {
 
     @DeleteMapping("/{id}")
     public void deleteAuthor(@PathVariable Long id){
-        service.delete(id);
+        Optional<AuthorResponseDTO> author = service.getById(id);
+        if (author.isPresent()){
+            service.delete(id);
+        }
+        else {
+            throw  new NotFoundException(String.format("Autor com o id %d não encontrado", id));
+        }
     }
-
 
 }

@@ -3,6 +3,7 @@ package com.biblioteca.biblioteca.controller;
 import com.biblioteca.biblioteca.dtos.request.LoanRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.LoanResponseDTO;
 import com.biblioteca.biblioteca.entities.Loan;
+import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.LoanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,24 +20,34 @@ import java.util.Optional;
 @RequestMapping("/loan")
 public class LoanController {
 
-    @Autowired
     private LoanService service;
+    public LoanController(LoanService service) {
+        this.service = service;
+    }
 
     @GetMapping
-    public List<LoanResponseDTO> loanList(){
-        return service.getAllLoans();
+    public ResponseEntity<List<LoanResponseDTO>> loanList(){
+        List<LoanResponseDTO> loans = service.getAllLoans();
+        return ResponseEntity.ok(loans);
     }
-
 
     @GetMapping("/{id}")
-    public Optional<LoanResponseDTO> loanId(@PathVariable Long id){
-        return service.getById(id);
+    public ResponseEntity<LoanResponseDTO> loanId(@PathVariable Long id){
+        return service.getById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new NotFoundException(String.format("Emprestimo com o id %d não encontrado", id)));
     }
 
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public void updateLoan(@PathVariable Long id){
-        service.toggleLoanStatus(id);
+        Optional<LoanResponseDTO> loan = service.getById(id);
+        if(loan.isPresent()) {
+            service.toggleLoanStatus(id);
+        }
+        else {
+            throw new NotFoundException(String.format("Emprestimo com id %d não encontrado", id));
+        }
     }
 
 
@@ -50,6 +61,12 @@ public class LoanController {
 
     @DeleteMapping("/{id}")
     public void deleteLoan(@PathVariable Long id){
-        service.delete(id);
+        Optional<LoanResponseDTO> loan = service.getById(id);
+        if(loan.isPresent()){
+            service.delete(id);
+        }
+        else {
+            throw new NotFoundException(String.format("Emprestimo com o id %d não encontrado", id));
+        }
     }
 }

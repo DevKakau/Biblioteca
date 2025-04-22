@@ -6,6 +6,8 @@ import com.biblioteca.biblioteca.entities.Book;
 import com.biblioteca.biblioteca.entities.User;
 import com.biblioteca.biblioteca.enums.LoanStatus;
 import com.biblioteca.biblioteca.entities.Loan;
+import com.biblioteca.biblioteca.exception.ConflictException;
+import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.repository.BookRepository;
 import com.biblioteca.biblioteca.repository.LoanRepository;
 import com.biblioteca.biblioteca.repository.UserRepository;
@@ -18,12 +20,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class LoanService {
-    @Autowired
+
     private LoanRepository loanRepository;
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private BookRepository bookRepository;
+
+    public LoanService(LoanRepository loanRepository, UserRepository userRepository, BookRepository bookRepository) {
+        this.loanRepository = loanRepository;
+        this.userRepository = userRepository;
+        this.bookRepository = bookRepository;
+    }
 
     // Listar todos os emprestismos
     public List<LoanResponseDTO> getAllLoans(){
@@ -41,17 +47,13 @@ public class LoanService {
 
     // Salvar um emprestimo no db
     public Loan createLoan(LoanRequestDTO dto) {
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
-        Book book = bookRepository.findById(dto.getBookId())
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
 
         Loan loan = new Loan();
         loan.setDataEmprestimo(dto.getDataEmprestimo());
         loan.setDataDevolucao(dto.getDataDevolucao());
         loan.setStatus(dto.getStatus());
-        loan.setUser(user);
-        loan.setBook(book);
+        loan.setUser(userRepository.findById(dto.getUserId()).orElseThrow());
+        loan.setBook(bookRepository.findById(dto.getBookId()).orElseThrow());
 
         return loanRepository.save(loan);
     }
