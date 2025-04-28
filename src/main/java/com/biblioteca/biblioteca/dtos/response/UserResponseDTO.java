@@ -5,13 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 public class UserResponseDTO {
-    private String nome;
-    private String email;
+    private final String name;
+    private final String email;
 
     public UserResponseDTO(User user){
-        this.nome = user.getNome();
+        this.name = user.getName();
         this.email = user.getEmail();
     }
 

@@ -1,16 +1,16 @@
 package com.biblioteca.biblioteca.dtos.request;
 
 import com.biblioteca.biblioteca.entities.Book;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 public class BookRequestDTO {
 
-    private String nameBook;
-    private Long authorId;
-    private int yearPublication;
-
+    private final String nameBook;
+    private final Long authorId;
+    private final int yearPublication;
 
 }

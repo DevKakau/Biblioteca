@@ -1,5 +1,6 @@
 package com.biblioteca.biblioteca.controller;
 
+import com.biblioteca.biblioteca.dtos.request.IdRequestDTO;
 import com.biblioteca.biblioteca.dtos.request.UserRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.UserResponseDTO;
 import com.biblioteca.biblioteca.entities.User;
@@ -21,39 +22,40 @@ import java.util.Optional;
 @RequestMapping("/user")
 public class UserController {
 
-    private UserService service;
+    private final UserService service;
     public UserController(UserService service) {
         this.service = service;
     }
 
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll(){
-        List<UserResponseDTO> userDTOS = service.getAll();
+    public ResponseEntity<List<UserResponseDTO>> listAll(){
+        List<UserResponseDTO> userDTOS = service.listAll();
         return ResponseEntity.ok(userDTOS);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> userId(@PathVariable Long id){
+    @PostMapping("/id")
+    public ResponseEntity<UserResponseDTO> getBy(@RequestBody IdRequestDTO request){
+        Long id = request.getId();
         return service.GetById(id)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new NotFoundException(String.format("Usuario com o id %d não encontrado", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("Usuario com o id ['%d'] não encontrado", id)));
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> saveUser(@RequestBody UserRequestDTO userDTO){
-        UserResponseDTO userResponseDTO = service.createUser(userDTO);
+    public ResponseEntity<UserResponseDTO> saveBy(@RequestBody UserRequestDTO userDTO){
+        UserResponseDTO userResponseDTO = service.saveBy(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id){
+    public void deleteBy(@PathVariable Long id){
         Optional<UserResponseDTO> user = service.GetById(id);
         if(user.isPresent()){
-            service.deleteUser(id);
+            service.deleteBy(id);
         }
         else {
-            throw new NotFoundException(String.format("Usuario com o id %d não encontrado", id));
+            throw new NotFoundException(String.format("Usuario com o id ['%d'] não encontrado", id));
         }
 
     }

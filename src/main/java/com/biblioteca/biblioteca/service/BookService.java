@@ -18,44 +18,45 @@ import java.util.stream.Collectors;
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    @Autowired
-    private AuthorRepository authorRepository;
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+    }
 
-    // Listar todos os livros
-    public List<BookResponseDTO> getAllBooks(){
+    public List<BookResponseDTO> listAll(){
         List<Book> books = bookRepository.findAll();
         return books.stream()
                 .map(BookResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // listar por id
+
     public Optional<BookResponseDTO> getById(Long id){
         return bookRepository.findById(id)
                 .map(BookResponseDTO::new);
     }
 
-    // salvar um novo livro no banco de dados
-    public Book createBook(BookRequestDTO bookDTO){
+
+    public Book saveBy(BookRequestDTO bookDTO){
         Author author = authorRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new NotFoundException(String.format("O autor com o id %d não foi encontrado", bookDTO.getAuthorId())));
 
-        if(!bookRepository.existsByNome(bookDTO.getNameBook())){
+        if(!bookRepository.existsByName(bookDTO.getNameBook())){
             Book book = new Book();
-            book.setNome(bookDTO.getNameBook());
+            book.setName(bookDTO.getNameBook());
             book.setAuthor(author);
-            book.setAnoPublicacao(bookDTO.getYearPublication());
+            book.setYearPublication(bookDTO.getYearPublication());
             return bookRepository.save(book);
         } else {
           throw  new ConflictException(String.format("O livro com o nome %s já foi cadastrado!!", bookDTO.getNameBook()));
         }
     }
 
-    // deletar livro pelo id
-    public void deleteBook(Long id){
+
+    public void deleteBy(Long id){
          bookRepository.deleteById(id);
     }
 

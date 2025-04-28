@@ -1,11 +1,11 @@
 package com.biblioteca.biblioteca.controller;
 
 import com.biblioteca.biblioteca.dtos.request.BookRequestDTO;
+import com.biblioteca.biblioteca.dtos.request.IdRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.BookResponseDTO;
 import com.biblioteca.biblioteca.entities.Book;
 import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,38 +17,39 @@ import java.util.Optional;
 @RequestMapping("/book")
 public class BookController {
 
-    private BookService service;
+    private final BookService service;
     public BookController(BookService service) {
         this.service = service;
     }
 
     @GetMapping
-    public ResponseEntity<List<BookResponseDTO>> bookList(){
-        List<BookResponseDTO> books = service.getAllBooks();
+    public ResponseEntity<List<BookResponseDTO>> listAll(){
+        List<BookResponseDTO> books = service.listAll();
         return ResponseEntity.ok(books);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BookResponseDTO> bookId(@PathVariable Long id){
+    @PostMapping("/id")
+    public ResponseEntity<BookResponseDTO> getBy(@RequestBody IdRequestDTO request ){
+        Long id = request.getId();
         return service.getById(id)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new NotFoundException(String.format("O livro com o id %d não foi encontrado", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("O livro com o id ['%d'] não encontrado", id)));
     }
 
     @PostMapping
-    public ResponseEntity<BookResponseDTO> saveBook(@RequestBody BookRequestDTO bookDTO){
-        Book book = service.createBook(bookDTO);
+    public ResponseEntity<BookResponseDTO> saveBy(@RequestBody BookRequestDTO bookDTO){
+        Book book = service.saveBy(bookDTO);
         BookResponseDTO bookResponseDTO = new BookResponseDTO(book);
         return ResponseEntity.status(HttpStatus.CREATED).body(bookResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBook(@PathVariable Long id){
+    public void deleteBy(@PathVariable Long id){
         Optional<BookResponseDTO> book  = service.getById(id);
         if (book.isPresent()){
-            service.deleteBook(id);
+            service.deleteBy(id);
         } else {
-          throw new NotFoundException(String.format("O livro de id %d não foi encontrado", id));
+          throw new NotFoundException(String.format("O livro com o id ['%d'] não encontrado", id));
         }
 
     }

@@ -1,10 +1,10 @@
 package com.biblioteca.biblioteca.controller;
 
 import com.biblioteca.biblioteca.dtos.request.AuthorRequestDTO;
+import com.biblioteca.biblioteca.dtos.request.IdRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.AuthorResponseDTO;
 import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.AuthorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,39 +16,41 @@ import java.util.Optional;
 @RequestMapping("/author")
 public class AuthorController {
 
+    private final AuthorService service;
+
     public AuthorController(AuthorService service) {
         this.service = service;
     }
 
-    private AuthorService service;
 
     @GetMapping
-    public ResponseEntity<List<AuthorResponseDTO>> authorList(){
-        List<AuthorResponseDTO> authorDTOS = service.getAllAuthors();
+    public ResponseEntity<List<AuthorResponseDTO>> listAll(){
+        List<AuthorResponseDTO> authorDTOS = service.listAll();
         return ResponseEntity.ok(authorDTOS);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AuthorResponseDTO> authorId(@PathVariable Long id){
+    @PostMapping("/id")
+    public ResponseEntity<AuthorResponseDTO> getBy(@RequestBody IdRequestDTO request){
+        Long id = request.getId();
         return service.getById(id)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new NotFoundException(String.format("Autor com o id %d não encontrado", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("Autor com o id ['%d'] não encontrado", id)));
     }
 
     @PostMapping
-    public ResponseEntity<AuthorResponseDTO> saveAuthor(@RequestBody AuthorRequestDTO authorRequestDTO){
-        AuthorResponseDTO authorResponseDTO = service.createAuthor(authorRequestDTO);
+    public ResponseEntity<AuthorResponseDTO> saveBy(@RequestBody AuthorRequestDTO authorRequestDTO){
+        AuthorResponseDTO authorResponseDTO = service.saveBy(authorRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(authorResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAuthor(@PathVariable Long id){
+    public void deleteBy(@PathVariable Long id){
         Optional<AuthorResponseDTO> author = service.getById(id);
         if (author.isPresent()){
-            service.delete(id);
+            service.deleteBy(id);
         }
         else {
-            throw  new NotFoundException(String.format("Autor com o id %d não encontrado", id));
+            throw  new NotFoundException(String.format("Autor com o id ['%d'] não encontrado", id));
         }
     }
 

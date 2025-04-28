@@ -17,29 +17,29 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository repository;
 
-    // listar todos os usuarios
-    public List<UserResponseDTO> getAll(){
-        List<User> users = userRepository.findAll();
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
+
+    public List<UserResponseDTO> listAll(){
+        List<User> users = repository.findAll();
         return users.stream()
                 .map(UserResponseDTO::new) // usando construtor que recebe a entidade
                 .collect(Collectors.toList());
     }
 
 
-    // Busca por id
     public Optional<UserResponseDTO> GetById(Long id){
-        return userRepository.findById(id)
+        return repository.findById(id)
                 .map(UserResponseDTO::new);
     }
 
-    // Criar um usuario no banco de dados
-    public UserResponseDTO createUser(UserRequestDTO userDto){
-        if(!userRepository.existsByEmail(userDto.getEmail())){
+    public UserResponseDTO saveBy(UserRequestDTO userDto){
+        if(!repository.existsByEmail(userDto.getEmail())){
             User user = userDto.toEntity();
-            User saved = userRepository.save(user);
+            User saved = repository.save(user);
             return new UserResponseDTO(saved);
         }
         else {
@@ -47,9 +47,8 @@ public class UserService {
         }
     }
 
-    // deletar um usuario do banco de dados atraves do ID
-    public void deleteUser(Long id){
-        userRepository.deleteById(id);
+    public void deleteBy(Long id){
+        repository.deleteById(id);
     }
 }
 

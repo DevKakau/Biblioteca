@@ -5,19 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 public class BookResponseDTO {
 
-    private Long id;
-    private String name;
-    private String nameAuthor;
-    private int yearPublication;
+    private final Long id;
+    private final String name;
+    private final String nameAuthor;
+    private final int yearPublication;
 
     public BookResponseDTO(Book book){
         this.id = book.getId();
-        this.name = book.getNome();
-        this.nameAuthor = book.getAuthor().getNome();
-        this.yearPublication = book.getAnoPublicacao();
+        this.name = book.getName();
+        this.nameAuthor = book.getAuthor().getName();
+        this.yearPublication = book.getYearPublication();
     }
 
 }

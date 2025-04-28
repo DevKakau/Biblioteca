@@ -20,8 +20,8 @@ public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nome;
-    private String nacionalidade;
+    private String name;
+    private String nationality;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)

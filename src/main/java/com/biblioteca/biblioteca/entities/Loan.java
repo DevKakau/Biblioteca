@@ -16,11 +16,12 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "TB_LOAN")
 public class Loan {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate dataEmprestimo;
-    private LocalDate dataDevolucao;
+    private LocalDate loanDate;
+    private LocalDate returnDate;
     @Enumerated(EnumType.STRING)
     private LoanStatus status;
 

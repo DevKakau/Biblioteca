@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 @Service
 public class LoanService {
 
-    private LoanRepository loanRepository;
-    private UserRepository userRepository;
-    private BookRepository bookRepository;
+    private final LoanRepository loanRepository;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
     public LoanService(LoanRepository loanRepository, UserRepository userRepository, BookRepository bookRepository) {
         this.loanRepository = loanRepository;
@@ -31,26 +31,24 @@ public class LoanService {
         this.bookRepository = bookRepository;
     }
 
-    // Listar todos os emprestismos
-    public List<LoanResponseDTO> getAllLoans(){
+    public List<LoanResponseDTO> listAll(){
         List<Loan> loanList = loanRepository.findAll();
         return loanList.stream()
                 .map(LoanResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Busca emprestimo pelo id
     public Optional<LoanResponseDTO> getById(Long id){
         return loanRepository.findById(id)
                 .map(LoanResponseDTO::new);
     }
 
-    // Salvar um emprestimo no db
-    public Loan createLoan(LoanRequestDTO dto) {
+
+    public Loan saveBy(LoanRequestDTO dto) {
 
         Loan loan = new Loan();
-        loan.setDataEmprestimo(dto.getDataEmprestimo());
-        loan.setDataDevolucao(dto.getDataDevolucao());
+        loan.setLoanDate(dto.getLoanDate());
+        loan.setReturnDate(dto.getReturnDate());
         loan.setStatus(dto.getStatus());
         loan.setUser(userRepository.findById(dto.getUserId()).orElseThrow());
         loan.setBook(bookRepository.findById(dto.getBookId()).orElseThrow());
@@ -58,7 +56,7 @@ public class LoanService {
         return loanRepository.save(loan);
     }
 
-    // atualizar o status do emprestimo
+
     public void toggleLoanStatus(Long id) {
         loanRepository.findById(id).ifPresent(loan -> {
             loan.setStatus(loan.getStatus() == LoanStatus.EM_ABERTO ? LoanStatus.DEVOLVIDO : LoanStatus.EM_ABERTO);
@@ -66,8 +64,8 @@ public class LoanService {
         });
     }
 
-    // deletar emprestimo do db pelo id
-    public  void delete(Long id){
+
+    public  void deleteBy(Long id){
         loanRepository.deleteById(id);
     }
 

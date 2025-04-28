@@ -9,21 +9,20 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Getter
-@Setter
-@NoArgsConstructor
+
 public class LoanResponseDTO {
 
-    private LocalDate dataEmprestimo;
-    private LocalDate dataDevolucao;
-    private LoanStatus status;
-    private String nameUser;
-    private String nameBook;
+    private final LocalDate loanDate;
+    private final LocalDate returnDate;
+    private final LoanStatus status;
+    private final String nameUser;
+    private final String nameBook;
 
     public LoanResponseDTO(Loan loan){
-        this.dataEmprestimo = loan.getDataEmprestimo();
-        this.dataDevolucao = loan.getDataDevolucao();
+        this.loanDate = loan.getLoanDate();
+        this.returnDate = loan.getReturnDate();
         this.status = loan.getStatus();
-        this.nameUser = loan.getUser().getNome();
-        this.nameBook = loan.getBook().getNome();
+        this.nameUser = loan.getUser().getName();
+        this.nameBook = loan.getBook().getName();
     }
 }
