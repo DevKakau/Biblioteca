@@ -44,7 +44,11 @@ public class BookService {
         Author author = authorRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new NotFoundException(String.format("O autor com o id %d não foi encontrado", bookDTO.getAuthorId())));
 
-        if(!bookRepository.existsByName(bookDTO.getNameBook())){
+        final String nameBook = Optional.ofNullable(bookDTO)
+                .map(BookRequestDTO::getNameBook)
+                .orElseThrow(() -> new IllegalArgumentException("Book name cannot be null"));
+
+        if(!bookRepository.existsByName(nameBook)){
             Book book = new Book();
             book.setName(bookDTO.getNameBook());
             book.setAuthor(author);

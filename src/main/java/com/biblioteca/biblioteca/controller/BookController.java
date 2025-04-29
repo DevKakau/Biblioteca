@@ -6,6 +6,7 @@ import com.biblioteca.biblioteca.dtos.response.BookResponseDTO;
 import com.biblioteca.biblioteca.entities.Book;
 import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<BookResponseDTO> saveBy(@RequestBody BookRequestDTO bookDTO){
+    public ResponseEntity<BookResponseDTO> saveBy(@RequestBody @Valid BookRequestDTO bookDTO){
         Book book = service.saveBy(bookDTO);
         BookResponseDTO bookResponseDTO = new BookResponseDTO(book);
         return ResponseEntity.status(HttpStatus.CREATED).body(bookResponseDTO);

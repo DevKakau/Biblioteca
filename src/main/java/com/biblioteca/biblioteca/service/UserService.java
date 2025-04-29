@@ -37,7 +37,12 @@ public class UserService {
     }
 
     public UserResponseDTO saveBy(UserRequestDTO userDto){
-        if(!repository.existsByEmail(userDto.getEmail())){
+
+        final String email = Optional.ofNullable(userDto)
+                .map(UserRequestDTO::getEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Email cannot be null"));
+
+        if(!repository.existsByEmail(email)){
             User user = userDto.toEntity();
             User saved = repository.save(user);
             return new UserResponseDTO(saved);

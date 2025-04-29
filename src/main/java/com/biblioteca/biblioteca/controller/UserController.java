@@ -9,6 +9,7 @@ import com.biblioteca.biblioteca.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> saveBy(@RequestBody UserRequestDTO userDTO){
+    public ResponseEntity<UserResponseDTO> saveBy(@RequestBody @Valid UserRequestDTO userDTO){
         UserResponseDTO userResponseDTO = service.saveBy(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
     }

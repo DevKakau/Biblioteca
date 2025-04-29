@@ -6,6 +6,7 @@ import com.biblioteca.biblioteca.dtos.response.LoanResponseDTO;
 import com.biblioteca.biblioteca.entities.Loan;
 import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.LoanService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,7 @@ public class LoanController {
 
 
     @PostMapping
-    public ResponseEntity<LoanResponseDTO> saveBy(@RequestBody LoanRequestDTO loanRequestDTO){
+    public ResponseEntity<LoanResponseDTO> saveBy(@RequestBody @Valid LoanRequestDTO loanRequestDTO){
         Loan loan = service.saveBy(loanRequestDTO);
         LoanResponseDTO responseDTO = new LoanResponseDTO(loan);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);

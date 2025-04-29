@@ -35,13 +35,18 @@ public class AuthorService {
     }
 
     public AuthorResponseDTO saveBy(AuthorRequestDTO authorRequestDTO){
-            if (!repository.existsByName(authorRequestDTO.getName())) {
+
+        final String name = Optional.ofNullable(authorRequestDTO)
+                .map(AuthorRequestDTO::getName)
+                .orElseThrow(() -> new IllegalArgumentException("Author name cannot be null"));
+
+            if (!repository.existsByName(name)) {
                 Author author = authorRequestDTO.toEntity();
                 Author saved = repository.save(author);
                 return new AuthorResponseDTO(saved);
             }
             else {
-                throw new ConflictException(String.format("Já existe um autor com o nome %s cadastrado no sistema", authorRequestDTO.getName()));
+                throw new ConflictException(String.format("Já existe um autor com o nome [%s] cadastrado no sistema", authorRequestDTO.getName()));
             }
     }
 

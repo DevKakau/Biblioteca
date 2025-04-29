@@ -5,6 +5,7 @@ import com.biblioteca.biblioteca.dtos.request.IdRequestDTO;
 import com.biblioteca.biblioteca.dtos.response.AuthorResponseDTO;
 import com.biblioteca.biblioteca.exception.NotFoundException;
 import com.biblioteca.biblioteca.service.AuthorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class AuthorController {
     }
 
     @PostMapping
-    public ResponseEntity<AuthorResponseDTO> saveBy(@RequestBody AuthorRequestDTO authorRequestDTO){
+    public ResponseEntity<AuthorResponseDTO> saveBy(@RequestBody @Valid AuthorRequestDTO authorRequestDTO){
         AuthorResponseDTO authorResponseDTO = service.saveBy(authorRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(authorResponseDTO);
     }
